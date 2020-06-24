@@ -44,10 +44,10 @@ if (fetch_data == T) {
   
   
   
-  if (!exists("data")) {
+  if (!dir.exists("data")) {
     dir.create("data")
   }
-  if (!exists("data/detections")) {
+  if (!dir.exists("data/detections")) {
     dir.create("data/detections")
   }
   
@@ -106,10 +106,10 @@ county_df <- detection_df %>%
 
 
 # check theres somewhere to save the figures
-if (!exists("figures")) {
+if (!dir.exists("figures")) {
   dir.create("figures")
 }
-if (!exists("figures/county_cases")) {
+if (!dir.exists("figures/county_cases")) {
   dir.create("figures/county_cases")
 }
 
@@ -144,7 +144,7 @@ ggsave('figures/county_cases/county_case_boxes.jpg', case_boxes)
 
 
 # look at regional trends
-if (!exists("figures/region_cases")) {
+if (!dir.exists("figures/region_cases")) {
   dir.create("figures/region_cases")
 }
 

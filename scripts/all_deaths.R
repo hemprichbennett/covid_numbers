@@ -42,8 +42,8 @@ if(fetch_data == T){
   
   date <- gsub('_COVID.+', '', date)
   
-  if(!exists('data')){dir.create('data')}
-  if(!exists('data/all_deaths')){dir.create('data/all_deaths')}
+  if(!dir.exists('data')){dir.create('data')}
+  if(!dir.exists('data/all_deaths')){dir.create('data/all_deaths')}
     
   write_csv(death_df,
             paste0('data/all_deaths/', date, '-COVID-19-UK-deaths-time-series.csv'))
@@ -89,8 +89,8 @@ death_df$Weekend[which(death_df$`Publicly confirmed as deceased as of 5pm this d
 #   filter(!is.na(Events))
 
 
-if(!exists('figures')){dir.create('figures')}
-if(!exists('figures/all_deaths')){dir.create('figures/all_deaths')}
+if(!dir.exists('figures')){dir.create('figures')}
+if(!dir.exists('figures/all_deaths')){dir.create('figures/all_deaths')}
 
 
 death_bars <- ggplot(death_df, aes(x = `Publicly confirmed as deceased as of 5pm this day`,

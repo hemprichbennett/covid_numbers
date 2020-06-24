@@ -32,10 +32,10 @@ if (fetch_data == T) {
 
 
 
-  if (!exists("data")) {
+  if (!dir.exists("data")) {
     dir.create("data")
   }
-  if (!exists("data/local_deaths")) {
+  if (!dir.exists("data/local_deaths")) {
     dir.create("data/local_deaths")
   }
 
@@ -76,10 +76,10 @@ death_df <- death_df %>%
 
 
 
-if (!exists("figures")) {
+if (!dir.exists("figures")) {
   dir.create("figures")
 }
-if (!exists("figures/local_deaths")) {
+if (!dir.exists("figures/local_deaths")) {
   dir.create("figures/local_deaths")
 }
 
