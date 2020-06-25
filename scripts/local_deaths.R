@@ -55,14 +55,19 @@ death_df <- death_df %>%
   # rearrange so that the rows are in chronological order
   arrange(reporting_date) %>%
   mutate(
+    # this dataset has 'reporting date' as a variable, which is actually the 
+    # date that the report was issued, rather than the date that a person died
+    # on. So we need to make a new column to give the date of death
+    death_record_date = reporting_date -1,
+    
     # some of the values are NA instead of NA, replace them so that zero-values
     # are included in plots
     daily_change_in_deaths = replace_na(daily_change_in_deaths, 0),
     # sort some week values for plotting of days and week beginnings
-    weekday = weekdays(reporting_date),
+    weekday = weekdays(death_record_date),
     Weekend = ifelse(weekday %in% c("Saturday", "Sunday"), "Weekend or bank holiday", "Weekday"),
     #week_no = week(reporting_date),
-    week_beginning = floor_date(reporting_date,
+    week_beginning = floor_date(death_record_date,
       unit = "week",
       # week starts on a Sunday
       week_start = getOption("lubridate.week.start", 7)
@@ -85,7 +90,8 @@ if (!dir.exists("figures/local_deaths")) {
 
 
 
-death_bars <- ggplot(filter(death_df, area_type == 'Nation'), aes(x = reporting_date,
+death_bars <- ggplot(filter(death_df, area_type == 'Nation'), 
+                     aes(x = death_record_date,
                                    y = daily_change_in_deaths
 ),
 )+
@@ -140,7 +146,7 @@ nations_df <- death_df %>%
 
 
 rate_bars <- ggplot(nations_df, 
-                    aes(x = reporting_date, y = death_rate))+
+                    aes(x = death_record_date, y = death_rate))+
   geom_bar(stat = 'identity', aes(fill = nations_df$Weekend))+
   theme_bw()+
   theme(legend.position = 'bottom')+
