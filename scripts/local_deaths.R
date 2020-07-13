@@ -100,7 +100,7 @@ death_bars <- ggplot(filter(death_df, area_type == 'Nation'),
   theme(legend.position = 'bottom')+
   scale_fill_viridis_d(option = 'E', name = 'Day')+
   xlab('Date')+
-  ylab('Daily deaths')+
+  ylab('Daily COVID-19 deaths')+
   facet_wrap(. ~ area_name, scales = 'free')
 
 death_bars
@@ -115,7 +115,7 @@ death_boxes <- ggplot(filter(death_df, area_type == 'Nation'),
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   xlab('Week beginning (Sunday)')+
-  ylab('Daily deaths')+
+  ylab('Daily COVID-19 deaths')+
   facet_wrap(. ~ area_name, scales = 'free')
 
 death_boxes
@@ -172,3 +172,64 @@ rate_boxes <- ggplot(nations_df,
 
 rate_boxes
 ggsave('figures/local_deaths/country_deathrate_boxes.jpg', rate_boxes)  
+
+
+
+week_deaths <- death_df %>%
+  filter(area_type == 'Nation') %>%
+  # add the info from country_populations
+  group_by(week_beginning, area_name) %>%
+  summarise(n_death = sum(daily_change_in_deaths)) %>%
+  left_join(country_populations) %>%
+  # calculate the death rate
+  mutate(death_rate = n_death / (population * 1000)) %>%
+  ggplot(., aes(x = week_beginning, y = death_rate, colour = area_name)) +
+  geom_point()+
+  scale_colour_viridis_d(name = 'Nation')+
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = 'bottom')+
+  xlab('Week beginning (Sunday)')+
+  ylab('Deaths per 1000 people')
+
+ggsave('figures/local_deaths/country_totaldeaths_points.jpg', week_deaths)
+
+
+
+
+daily_deaths <- death_df %>%
+  filter(area_type == 'Nation') %>%
+  # add the info from country_populations
+  #group_by(week_beginning, area_name) %>%
+  #summarise(n_death = sum(daily_change_in_deaths)) %>%
+  left_join(country_populations) %>%
+  # calculate the death rate
+  mutate(death_rate = daily_change_in_deaths / (population * 1000)) %>%
+  ggplot(., 
+         aes(x = death_record_date, y = death_rate))+
+  geom_bar(stat = 'identity', aes(fill = nations_df$Weekend))+
+  theme_bw()+
+  theme(legend.position = 'bottom')+
+  scale_fill_viridis_d(option = 'E', name = 'Day')+
+  xlab('Date')+
+  facet_wrap(. ~ area_name) +
+  ylab('Officially recorded COVID deaths per 1000 people')
+
+daily_deaths
+ggsave('figures/local_deaths/country_daily_deathrate_points.jpg', daily_deaths)
+
+
+death_line <- death_df %>%
+  filter(area_type == 'Nation') %>%
+  # add the info from country_populations
+  #group_by(week_beginning, area_name) %>%
+  #summarise(n_death = sum(daily_change_in_deaths)) %>%
+  left_join(country_populations) %>%
+  # calculate the death rate
+  mutate(death_rate = daily_change_in_deaths / (population * 1000)) %>%
+  ggplot(., aes(x = death_record_date, y = death_rate, colour = area_name))+
+  geom_line()+
+  scale_color_viridis_d()+
+  theme_bw()
+
+death_line
