@@ -121,9 +121,9 @@ county_bars <- ggplot(county_df,
   theme_bw()+
   theme(legend.position = 'bottom')+
   xlab('Date upon which test was completed')+
-  ylab('Number of positive COVID-19 tests')+
+  ylab('Number of positive pillar 1 COVID-19 tests')+
   scale_fill_viridis_d(option = 'E', name = 'Day')+
-  facet_wrap(. ~ area_name)
+  facet_wrap(. ~ area_name, scales = 'free')
 
 county_bars
 ggsave('figures/county_cases/county_case_bars.jpg', county_bars)  
@@ -136,7 +136,7 @@ case_boxes <- ggplot(county_df,
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   xlab('Week beginning (Sunday)')+
-  ylab('Number of positive COVID-19 tests')+
+  ylab('Number of positive pillar 1 COVID-19 tests')+
   facet_wrap(. ~ area_name, scales = 'free')
 
 case_boxes
@@ -159,7 +159,27 @@ region_bars <- ggplot(filter(detection_df, area_type == 'Region'),
   xlab('Date upon which test was completed')+
   ylab('Number of positive COVID-19 tests')+
   scale_fill_viridis_d(option = 'E', name = 'Day')+
-  facet_wrap(. ~ area_name)
+  facet_wrap(. ~ area_name, scales = 'free')
 region_bars
 
 ggsave('figures/region_cases/region_case_bars.jpg', region_bars)  
+
+
+mar_23rd <- detection_df %>%
+  filter(specimen_date == '2020-03-23' & area_name == 'England') %>%
+  pull(daily_lab_confirmed_cases)
+
+ggplot(filter(detection_df, area_type == 'Nation'),
+       aes(x = specimen_date, 
+           y = daily_lab_confirmed_cases))+
+  geom_bar(stat = 'identity', 
+           aes(fill = filter(detection_df, area_type == 'Nation')$Weekend))+
+  geom_hline(yintercept = mar_23rd)+
+  theme_bw()+
+  theme(legend.position = 'bottom')+
+  xlab('Date upon which test was completed')+
+  ylab('Number of positive pillar 1 COVID-19 tests')+
+  scale_fill_viridis_d(option = 'E', name = 'Day')+
+  facet_wrap(. ~ area_name, scales = 'free')
+
+
