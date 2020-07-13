@@ -33,14 +33,7 @@ if(fetch_data == T){
   
   # pull the date of the latest data from the url the file was downloaded from
   
-  # get rid of all characters before '2020' (the beginning of the date in the 
-  # string)
-  date <- gsub('.+2020', '2020', csv_string)
-  
-  # get rid of all characters after 'COVID' (the end of the date in the 
-  # string)
-  
-  date <- gsub('_COVID.+', '', date)
+  date <- Sys.Date()
   
   if(!dir.exists('data')){dir.create('data')}
   if(!dir.exists('data/all_deaths')){dir.create('data/all_deaths')}
@@ -66,8 +59,9 @@ death_df <- death_df %>%
          Events = rep(NA, nrow(.)),
          week_no = week(`Publicly confirmed as deceased as of 5pm this day`),
          week_beginning = floor_date(`Publicly confirmed as deceased as of 5pm this day`, unit = 'week',
-                                     # week starts on a Sunday
-                                     week_start = getOption("lubridate.week.start", 7)),
+                                     # week starts on a Thursday as thats the date of our
+                                     # first death
+                                     week_start = getOption("lubridate.week.start", 4)),
          week_beginning = paste(month(week_beginning, label = T), 
                                 day(week_beginning)),
          week_beginning = factor(week_beginning, levels = unique(week_beginning)))
@@ -111,12 +105,19 @@ death_bars
 ggsave('figures/all_deaths/death_bars.jpg', death_bars)  
 
 
-death_boxes <- ggplot(death_df, aes(x = week_beginning, 
+death_boxes <- death_df %>%
+  # filter out any incomplete weeks as they're not a fair comparison
+  # for the boxplots
+  group_by(week_beginning) %>%
+  summarise(n_days = n()) %>%
+  left_join(death_df) %>%
+  filter(n_days == 7) %>%
+  ggplot(., aes(x = week_beginning, 
                      y = `UK Daily count of deaths in all settings`))+
   geom_boxplot()+ 
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  xlab('Week beginning (Sunday)')
+  xlab('Week beginning (Thursday)')
 
 death_boxes
 ggsave('figures/all_deaths/death_boxes.jpg', death_boxes, dpi = 600)
@@ -125,22 +126,15 @@ ggsave('figures/all_deaths/death_boxes.jpg', death_boxes, dpi = 600)
 
 
 death_df %>%
-  filter(week_beginning %in% c('May 17', 'May 24', 'May 31', 'Jun 7', 'Jun 14')) %>%
-  lm(`UK Daily count of deaths in all settings` ~ week_beginning + weekday, data = .) %>%
-  MASS::stepAIC() %>%
-  anova()
-
-
-mod <- death_df %>%
-  filter(week_beginning %in% c('May 24', 'May 31', 'Jun 7', 'Jun 14')) %>%
-  lm(`UK Daily count of deaths in all settings` ~ week_beginning + weekday, data = .) 
-broom::tidy(mod)
-
-
-
-death_df %>%
+  # filter out any incomplete weeks as they're not a fair comparison
+  # for the boxplots
   group_by(week_beginning) %>%
-  summarise(deaths_per_day = sum(`UK Daily count of deaths in all settings`/n())) %>%
-  ggplot(aes(x = week_beginning, y = deaths_per_day)) +
-  geom_point()+
-  theme_bw()
+  summarise(n_days = n()) %>%
+  left_join(death_df) %>%
+  filter(n_days == 7) %>%
+  ggplot(., aes(y = forcats::fct_rev(week_beginning), 
+                x = `UK Daily count of deaths in all settings`))+
+  ggridges::geom_density_ridges()+ 
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  ylab('Week beginning (Thursday)')
