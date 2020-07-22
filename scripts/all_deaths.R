@@ -48,7 +48,11 @@ if(fetch_data == T){
   death_df <- read_csv(deaths_files[length(deaths_files)])
 }
 
-
+death_df <- death_df %>%
+  mutate(`UK Cumulative count of deaths in all settings` = gsub('N/A', NA, `UK Cumulative count of deaths in all settings`),
+         `UK Daily count of deaths in all settings` = gsub('N/A', NA, `UK Daily count of deaths in all settings`),
+         `UK Cumulative count of deaths in all settings` = as.numeric(`UK Cumulative count of deaths in all settings`),
+         `UK Daily count of deaths in all settings` = as.numeric(`UK Daily count of deaths in all settings`))
 
 
 death_df <- death_df %>%
