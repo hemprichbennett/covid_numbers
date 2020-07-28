@@ -164,22 +164,50 @@ region_bars
 
 ggsave('figures/region_cases/region_case_bars.jpg', region_bars)  
 
+# 
+# mar_23rd <- detection_df %>%
+#   filter(specimen_date == '2020-03-23' & area_name == 'England') %>%
+#   pull(daily_lab_confirmed_cases)
+# 
+# ggplot(filter(detection_df, area_type == 'Nation'),
+#        aes(x = specimen_date, 
+#            y = daily_lab_confirmed_cases))+
+#   geom_bar(stat = 'identity', 
+#            aes(fill = filter(detection_df, area_type == 'Nation')$Weekend))+
+#   geom_hline(yintercept = mar_23rd)+
+#   theme_bw()+
+#   theme(legend.position = 'bottom')+
+#   xlab('Date upon which test was completed')+
+#   ylab('Number of positive pillar 1 COVID-19 tests')+
+#   scale_fill_viridis_d(option = 'E', name = 'Day')+
+#   facet_wrap(. ~ area_name, scales = 'free')
 
-mar_23rd <- detection_df %>%
-  filter(specimen_date == '2020-03-23' & area_name == 'England') %>%
-  pull(daily_lab_confirmed_cases)
+region_week <- detection_df %>% 
+  filter(area_type == 'Region') %>% 
+  group_by(week_beginning) %>%
+  summarise(n_days = length(unique(specimen_date))) %>%
+  filter(n_days == 7) %>%
+  left_join(filter(detection_df, area_type =='Region')) 
 
-ggplot(filter(detection_df, area_type == 'Nation'),
-       aes(x = specimen_date, 
-           y = daily_lab_confirmed_cases))+
-  geom_bar(stat = 'identity', 
-           aes(fill = filter(detection_df, area_type == 'Nation')$Weekend))+
-  geom_hline(yintercept = mar_23rd)+
+region_boxplot <- ggplot(region_week, 
+                         aes(x = week_beginning, 
+                             y = daily_lab_confirmed_cases)) + 
+  geom_boxplot() +
+  facet_wrap(. ~ area_name, scales = 'free') +
   theme_bw()+
-  theme(legend.position = 'bottom')+
-  xlab('Date upon which test was completed')+
-  ylab('Number of positive pillar 1 COVID-19 tests')+
-  scale_fill_viridis_d(option = 'E', name = 'Day')+
-  facet_wrap(. ~ area_name, scales = 'free')
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+region_boxplot
+ggsave('figures/region_cases/region_case_boxplot.pdf', region_boxplot)
 
+region_week_bar <- region_week %>%
+  group_by(area_name, week_beginning) %>%
+  summarise(n_cases = sum(daily_lab_confirmed_cases)) %>%
+  ggplot(., aes(x = week_beginning, y = n_cases)) +
+  geom_bar(stat = 'identity')+
+  facet_wrap(. ~ area_name, scales = 'free') +
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+ 
+  labs(x = 'Week beginning', y = 'Number of cases per week')
+
+ggsave('figures/region_cases/region_week_barplot.pdf', region_week_bar)
