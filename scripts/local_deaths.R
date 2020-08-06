@@ -90,12 +90,12 @@ if (!dir.exists("figures/local_deaths")) {
 
 
 
-death_bars <- ggplot(filter(death_df, area_type == 'Nation'), 
+death_bars <- ggplot(filter(death_df, area_type == 'nation'), 
                      aes(x = death_record_date,
                                    y = daily_change_in_deaths
 ),
 )+
-  geom_bar(stat = 'identity', aes(fill = filter(death_df, area_type == 'Nation')$Weekend))+
+  geom_bar(stat = 'identity', aes(fill = filter(death_df, area_type == 'nation')$Weekend))+
   theme_bw()+
   theme(legend.position = 'bottom')+
   scale_fill_viridis_d(option = 'E', name = 'Day')+
@@ -108,7 +108,7 @@ ggsave('figures/local_deaths/country_death_bars.jpg', death_bars)
 
 
 
-death_boxes <- ggplot(filter(death_df, area_type == 'Nation'), 
+death_boxes <- ggplot(filter(death_df, area_type == 'nation'), 
                       aes(x = week_beginning, 
                                     y = daily_change_in_deaths))+
   geom_boxplot()+ 
@@ -137,7 +137,7 @@ country_populations <- tibble(area_name = c('England', 'Northern Ireland',
                                       5463300, 3152879))
 
 nations_df <- death_df %>%
-  filter(area_type == 'Nation') %>%
+  filter(area_type == 'nation') %>%
   # add the info from country_populations
   left_join(country_populations) %>%
   # calculate the death rate
@@ -176,7 +176,7 @@ ggsave('figures/local_deaths/country_deathrate_boxes.jpg', rate_boxes)
 
 
 week_deaths <- death_df %>%
-  filter(area_type == 'Nation') %>%
+  filter(area_type == 'nation') %>%
   # add the info from country_populations
   group_by(week_beginning, area_name) %>%
   summarise(n_death = sum(daily_change_in_deaths)) %>%
@@ -198,7 +198,7 @@ ggsave('figures/local_deaths/country_totaldeaths_points.jpg', week_deaths)
 
 
 daily_deaths <- death_df %>%
-  filter(area_type == 'Nation') %>%
+  filter(area_type == 'nation') %>%
   # add the info from country_populations
   #group_by(week_beginning, area_name) %>%
   #summarise(n_death = sum(daily_change_in_deaths)) %>%
@@ -220,7 +220,7 @@ ggsave('figures/local_deaths/country_daily_deathrate_points.jpg', daily_deaths)
 
 
 death_line <- death_df %>%
-  filter(area_type == 'Nation') %>%
+  filter(area_type == 'nation') %>%
   # add the info from country_populations
   #group_by(week_beginning, area_name) %>%
   #summarise(n_death = sum(daily_change_in_deaths)) %>%

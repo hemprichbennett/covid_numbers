@@ -149,11 +149,11 @@ if (!dir.exists("figures/region_cases")) {
 }
 
 # make a barplot of regional case detections
-region_bars <- ggplot(filter(detection_df, area_type == 'Region'),
+region_bars <- ggplot(filter(detection_df, area_type == 'region'),
                       aes(x = specimen_date, 
                           y = daily_lab_confirmed_cases))+
   geom_bar(stat = 'identity', 
-           aes(fill = filter(detection_df, area_type == 'Region')$Weekend))+
+           aes(fill = filter(detection_df, area_type == 'region')$Weekend))+
   theme_bw()+
   theme(legend.position = 'bottom')+
   xlab('Date upon which test was completed')+
@@ -183,11 +183,11 @@ ggsave('figures/region_cases/region_case_bars.jpg', region_bars)
 #   facet_wrap(. ~ area_name, scales = 'free')
 
 region_week <- detection_df %>% 
-  filter(area_type == 'Region') %>% 
+  filter(area_type == 'region') %>% 
   group_by(week_beginning) %>%
   summarise(n_days = length(unique(specimen_date))) %>%
   filter(n_days == 7) %>%
-  left_join(filter(detection_df, area_type =='Region')) 
+  left_join(filter(detection_df, area_type =='region')) 
 
 region_boxplot <- ggplot(region_week, 
                          aes(x = week_beginning, 
