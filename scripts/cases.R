@@ -123,7 +123,7 @@ county_bars <- ggplot(county_df,
   xlab('Date upon which test was completed')+
   ylab('Number of positive pillar 1 COVID-19 tests')+
   scale_fill_viridis_d(option = 'E', name = 'Day')+
-  facet_wrap(. ~ area_name, scales = 'free')
+  facet_wrap(. ~ area_name)
 
 county_bars
 ggsave('figures/county_cases/county_case_bars.jpg', county_bars)  
@@ -207,7 +207,8 @@ region_week_bar <- region_week %>%
   geom_bar(stat = 'identity')+
   facet_wrap(. ~ area_name, scales = 'free') +
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text=element_text(size=7))+ 
   labs(x = 'Week beginning', y = 'Number of cases per week')
 
 ggsave('figures/region_cases/region_week_barplot.pdf', region_week_bar)
